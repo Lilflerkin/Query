@@ -1,3 +1,5 @@
+
+
 SELECT 
     a.num,
     b.module_name,
@@ -6,7 +8,7 @@ SELECT
     b.description,
     b.sla,
     b.frequency,
-    DATE_ADD(LAST_DAY(ADD_MONTHS(from_unixtime(unix_timestamp()), -1)), a.num) AS executiondate
+    DATE_ADD(c.month_start, a.num - 1) AS executiondate
 FROM (
     SELECT 1 AS num UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL 
     SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL 
@@ -28,7 +30,14 @@ CROSS JOIN (
     FROM bsl_cacl_risk_sox_db.cacl_jobs_details
     WHERE frequency = 'Daily'
 ) b
+CROSS JOIN (
+    SELECT DATE_ADD(TRUNC(ADD_MONTHS(from_unixtime(unix_timestamp()), -5), 'MM'), (t.month - 1) * 30) AS month_start
+    FROM (
+        SELECT 1 AS month UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL
+        SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6
+    ) t
+) c
 WHERE 
-    DATE_ADD(LAST_DAY(ADD_MONTHS(from_unixtime(unix_timestamp()), -1)), a.num) >= '2024-02-01'
-    AND DATE_ADD(LAST_DAY(ADD_MONTHS(from_unixtime(unix_timestamp()), -1)), a.num) <= LAST_DAY(from_unixtime(unix_timestamp()));
-
+    DATE_ADD(c.month_start, a.num - 1) >= '2024-02-01'
+    AND DATE_ADD(c.month_start, a.num - 1) <= from_unixtime(unix_timestamp())
+ORDER BY executiondate;

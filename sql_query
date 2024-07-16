@@ -1,5 +1,3 @@
-
-
 SELECT 
     a.num,
     b.module_name,
@@ -8,7 +6,7 @@ SELECT
     b.description,
     b.sla,
     b.frequency,
-    DATE_ADD(c.month_start, a.num - 1) AS executiondate
+    DATE_ADD(LAST_DAY(ADD_MONTHS(from_unixtime(unix_timestamp()), -c.month_offset-1)), a.num) AS executiondate
 FROM (
     SELECT 1 AS num UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL 
     SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL 
@@ -31,13 +29,10 @@ CROSS JOIN (
     WHERE frequency = 'Daily'
 ) b
 CROSS JOIN (
-    SELECT DATE_ADD(TRUNC(ADD_MONTHS(from_unixtime(unix_timestamp()), -5), 'MM'), (t.month - 1) * 30) AS month_start
-    FROM (
-        SELECT 1 AS month UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL
-        SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6
-    ) t
+    SELECT 0 AS month_offset UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL 
+    SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5
 ) c
 WHERE 
-    DATE_ADD(c.month_start, a.num - 1) >= '2024-02-01'
-    AND DATE_ADD(c.month_start, a.num - 1) <= from_unixtime(unix_timestamp())
+    DATE_ADD(LAST_DAY(ADD_MONTHS(from_unixtime(unix_timestamp()), -c.month_offset-1)), a.num) >= '2024-02-01'
+    AND DATE_ADD(LAST_DAY(ADD_MONTHS(from_unixtime(unix_timestamp()), -c.month_offset-1)), a.num) <= from_unixtime(unix_timestamp())
 ORDER BY executiondate;

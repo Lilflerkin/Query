@@ -6,7 +6,7 @@ SELECT
     b.description,
     b.sla,
     b.frequency,
-    DATE_ADD(LAST_DAY(ADD_MONTHS(CURRENT_DATE, -1)), a.num) AS executiondate
+    DATE_ADD(LAST_DAY(ADD_MONTHS(CAST(current_date() AS TIMESTAMP), -1)), a.num) AS executiondate
 FROM (
     SELECT 
         1 AS num UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL 
@@ -30,5 +30,6 @@ CROSS JOIN (
     WHERE frequency = 'Daily'
 ) b
 WHERE 
-    DATE_ADD(LAST_DAY(ADD_MONTHS(CAST(current_date AS TIMESTAMP), -1)), a.num) >= '2024-02-01'
-    AND DATE_ADD(LAST_DAY(ADD_MONTHS(CAST(current_date AS TIMESTAMP), -1)), a.num) <= LAST_DAY(CAST(current_date AS TIMESTAMP));
+    DATE_ADD(LAST_DAY(ADD_MONTHS(CAST(current_date() AS TIMESTAMP), -1)), a.num) >= '2024-02-01'
+    AND DATE_ADD(LAST_DAY(ADD_MONTHS(CAST(current_date() AS TIMESTAMP), -1)), a.num) <= LAST_DAY(CAST(current_date() AS TIMESTAMP));
+

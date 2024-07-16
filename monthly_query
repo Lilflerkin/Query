@@ -7,7 +7,7 @@ SELECT
     b.frequency,
     DATE_ADD(LAST_DAY(ADD_MONTHS(from_unixtime(unix_timestamp()), -c.month_offset)), 1) AS month_start,
     DATE_ADD(DATE_ADD(LAST_DAY(ADD_MONTHS(from_unixtime(unix_timestamp()), -c.month_offset)), 1),
-             cast(trim(b.sla, 'WD ') as int) - 1) AS executiondate
+             cast(regexp_replace(b.sla, 'WD ', '') as int) - 1) AS executiondate
 FROM (
     SELECT 
         module_name,
@@ -25,9 +25,9 @@ CROSS JOIN (
 ) c
 WHERE 
     DATE_ADD(DATE_ADD(LAST_DAY(ADD_MONTHS(from_unixtime(unix_timestamp()), -c.month_offset)), 1),
-             cast(trim(b.sla, 'WD ') as int) - 1) >= '2024-02-01'
+             cast(regexp_replace(b.sla, 'WD ', '') as int) - 1) >= '2024-02-01'
     AND DATE_ADD(DATE_ADD(LAST_DAY(ADD_MONTHS(from_unixtime(unix_timestamp()), -c.month_offset)), 1),
-                 cast(trim(b.sla, 'WD ') as int) - 1) <= from_unixtime(unix_timestamp())
+                 cast(regexp_replace(b.sla, 'WD ', '') as int) - 1) <= from_unixtime(unix_timestamp())
     AND DAYOFWEEK(DATE_ADD(DATE_ADD(LAST_DAY(ADD_MONTHS(from_unixtime(unix_timestamp()), -c.month_offset)), 1),
-                          cast(trim(b.sla, 'WD ') as int) - 1)) BETWEEN 2 AND 6
+                          cast(regexp_replace(b.sla, 'WD ', '') as int) - 1)) BETWEEN 2 AND 6
 ORDER BY executiondate;

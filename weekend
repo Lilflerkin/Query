@@ -1,0 +1,65 @@
+SELECT 
+    b.module_name,
+    b.schedule_name,
+    b.job_name,
+    b.description,
+    b.sla,
+    b.frequency,
+    DATE_ADD(LAST_DAY(ADD_MONTHS(from_unixtime(unix_timestamp()), -c.month_offset)), 1) AS month_start,
+    CASE 
+        WHEN DAYOFWEEK(DATE_ADD(DATE_ADD(LAST_DAY(ADD_MONTHS(from_unixtime(unix_timestamp()), -c.month_offset)), 1),
+                                cast(trim(b.sla, 'WD ') as int) - 1)) IN (1, 7) 
+        THEN DATE_ADD(DATE_ADD(DATE_ADD(LAST_DAY(ADD_MONTHS(from_unixtime(unix_timestamp()), -c.month_offset)), 1),
+                               cast(trim(b.sla, 'WD ') as int) - 1),
+                      CASE 
+                          WHEN DAYOFWEEK(DATE_ADD(DATE_ADD(LAST_DAY(ADD_MONTHS(from_unixtime(unix_timestamp()), -c.month_offset)), 1),
+                                                  cast(trim(b.sla, 'WD ') as int) - 1)) = 7 THEN 2
+                          ELSE 1
+                      END)
+        ELSE DATE_ADD(DATE_ADD(LAST_DAY(ADD_MONTHS(from_unixtime(unix_timestamp()), -c.month_offset)), 1),
+                      cast(trim(b.sla, 'WD ') as int) - 1)
+    END AS executiondate
+FROM (
+    SELECT 
+        module_name,
+        schedule_name,
+        job_name,
+        description,
+        sla,
+        frequency
+    FROM bsl_cacl_risk_sox_db.cacl_jobs_details
+    WHERE frequency = 'Monthly'
+) b
+CROSS JOIN (
+    SELECT 0 AS month_offset UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL 
+    SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5
+) c
+WHERE 
+    CASE 
+        WHEN DAYOFWEEK(DATE_ADD(DATE_ADD(LAST_DAY(ADD_MONTHS(from_unixtime(unix_timestamp()), -c.month_offset)), 1),
+                                cast(trim(b.sla, 'WD ') as int) - 1)) IN (1, 7) 
+        THEN DATE_ADD(DATE_ADD(DATE_ADD(LAST_DAY(ADD_MONTHS(from_unixtime(unix_timestamp()), -c.month_offset)), 1),
+                               cast(trim(b.sla, 'WD ') as int) - 1),
+                      CASE 
+                          WHEN DAYOFWEEK(DATE_ADD(DATE_ADD(LAST_DAY(ADD_MONTHS(from_unixtime(unix_timestamp()), -c.month_offset)), 1),
+                                                  cast(trim(b.sla, 'WD ') as int) - 1)) = 7 THEN 2
+                          ELSE 1
+                      END)
+        ELSE DATE_ADD(DATE_ADD(LAST_DAY(ADD_MONTHS(from_unixtime(unix_timestamp()), -c.month_offset)), 1),
+                      cast(trim(b.sla, 'WD ') as int) - 1)
+    END >= '2024-02-01'
+    AND CASE 
+        WHEN DAYOFWEEK(DATE_ADD(DATE_ADD(LAST_DAY(ADD_MONTHS(from_unixtime(unix_timestamp()), -c.month_offset)), 1),
+                                cast(trim(b.sla, 'WD ') as int) - 1)) IN (1, 7) 
+        THEN DATE_ADD(DATE_ADD(DATE_ADD(LAST_DAY(ADD_MONTHS(from_unixtime(unix_timestamp()), -c.month_offset)), 1),
+                               cast(trim(b.sla, 'WD ') as int) - 1),
+                      CASE 
+                          WHEN DAYOFWEEK(DATE_ADD(DATE_ADD(LAST_DAY(ADD_MONTHS(from_unixtime(unix_timestamp()), -c.month_offset)), 1),
+                                                  cast(trim(b.sla, 'WD ') as int) - 1)) = 7 THEN 2
+                          ELSE 1
+                      END)
+        ELSE DATE_ADD(DATE_ADD(LAST_DAY(ADD_MONTHS(from_unixtime(unix_timestamp()), -c.month_offset)), 1),
+                      cast(trim(b.sla, 'WD ') as int) - 1)
+    END <= from_unixtime(unix_timestamp())
+ORDER BY executiondate;
+

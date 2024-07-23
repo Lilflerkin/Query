@@ -1,37 +1,17 @@
-(
-SELECT 
-    a.num,
-    b.module_name,
-    b.schedule_name,
-    b.job_name,
-    b.description,
-    b.sla,
-    b.frequency,
-    DATE_ADD(LAST_DAY(ADD_MONTHS(from_unixtime(unix_timestamp()), -c.month_offset-1)), a.num) AS executiondate
-FROM 
-    (SELECT 1 AS num UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL 
-     SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL 
-     SELECT 9 UNION ALL SELECT 10 UNION ALL SELECT 11 UNION ALL SELECT 12 UNION ALL 
-     SELECT 13 UNION ALL SELECT 14 UNION ALL SELECT 15 UNION ALL SELECT 16 UNION ALL 
-     SELECT 17 UNION ALL SELECT 18 UNION ALL SELECT 19 UNION ALL SELECT 20 UNION ALL 
-     SELECT 21 UNION ALL SELECT 22 UNION ALL SELECT 23 UNION ALL SELECT 24 UNION ALL 
-     SELECT 25 UNION ALL SELECT 26 UNION ALL SELECT 27 UNION ALL SELECT 28 UNION ALL 
-     SELECT 29 UNION ALL SELECT 30 UNION ALL SELECT 31) a
-CROSS JOIN 
-    (SELECT 
-         module_name,
-         schedule_name,
-         job_name,
-         description,
-         sla,
-         frequency
-     FROM bsl_cacl_risk_sox_db.cacl_jobs_details
-     WHERE frequency = 'Daily') b
-CROSS JOIN 
-    (SELECT 0 AS month_offset UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL 
-     SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5) c
-WHERE 
-    DATE_ADD(LAST_DAY(ADD_MONTHS(from_unixtime(unix_timestamp()), -c.month_offset-1)), a.num) >= '2024-02-01'
-    AND DATE_ADD(LAST_DAY(ADD_MONTHS(from_unixtime(unix_timestamp()), -c.month_offset-1)), a.num) <= from_unixtime(unix_timestamp())
-ORDER BY executiondate
-) AS derived_table
+Dear Team,
+
+As my time here at Barclays draws to a close, I wanted to take a moment to express my heartfelt gratitude for the incredible support and guidance you have all provided throughout this journey.
+
+Working on the project to automate the manual process of identifying and resolving CACL job failures through a dashboard has been both a challenging and rewarding experience. I am deeply thankful for the way each one of you assisted me, from the smallest tasks to the more complex ones that I found difficult to grasp.
+
+To my manager, thank you for your unwavering support and direction. Your encouragement to brainstorm and think critically has been invaluable. Your feedback and advice have continually pushed me to refine and improve the project in every way possible. Your leadership has truly been a guiding light.
+
+To the entire team, I am grateful for your cordiality, patience, and willingness to help me understand even the most intricate aspects of our work. Your honest and constructive feedback has been instrumental in my learning and in the success of this project. You have all been more than just colleagues; you have been mentors and friends.
+
+During my time here, I have had the opportunity to learn and work with a variety of technical tools and methodologies, including Excel, Tableau, Unix, Tivoli, Agile, and JIRA. Each of these has significantly contributed to my professional growth and understanding of our processes.
+
+Thank you for creating an environment where I could grow, learn, and contribute meaningfully. I will carry the lessons learned and the memories made here with me as I move forward in my career.
+
+Wishing you all continued success and looking forward to staying in touch.
+
+Warm regards,
